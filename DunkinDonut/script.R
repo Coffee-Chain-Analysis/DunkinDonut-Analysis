@@ -11,19 +11,21 @@ us_states<-map_data("state")
 
 zip<-zip %>% 
   mutate(ZIP=as.numeric(ZIP))
+  
+df <- df %>%
+  mutate(ZIP = sapply(strsplit(df$X4, split='|', fixed=TRUE), function(x) (x[2]))) 
+
+df <- df %>%
+  mutate(DATA = sapply(strsplit(df$ZIP, split=c(','), fixed=TRUE), function(x) (x[2]))) 
+
+df <- df %>%
+  mutate(ZIP = sapply(strsplit(df$DATA, split=c(' '), fixed=TRUE), function(x) (x[2]))) 
+
 
 df<-df %>% 
-  mutate(ZIP=as.numeric(str_match(X4,"(\\d{5})")[1]))
-  
-df <- df %>% 
-  mutate(STATE = sapply(strsplit(df$X3, split=',', fixed=TRUE), function(x) (x[2]))) %>% 
-  group_by(STATE)
+  mutate(ZIP=as.numeric(ZIP))
 
-
-data<-left_join(zip, by="STATE") %>% 
-  mutate(COUNTYNAME=str_remove(COUNTYNAME," County")) %>% 
-  rename(subregion=COUNTYNAME) %>% 
-  mutate(subregion=tolower(subregion)) %>% 
+data<-left_join(df,zip, by=c("ZIP")) %>% 
   group_by(STATE) %>%
   count() %>%
   na.omit()
@@ -59,7 +61,7 @@ data%>%
   coord_equal()+
   theme_map()+
   theme(panel.background = element_blank()) + ggtitle("US Dunkin' Donut's Location", subtitle = "Average # of Stores") + labs(fill = "Average") + theme(legend.position="bottom", plot.title = element_text(hjust = 0.5),plot.subtitle =  element_text(hjust = 0.5))+
-  scale_fill_gradient(low = "orange", high = "purple", guide = guide_legend()) + geom_text(data = centroid, mapping = aes(x_avg,y_avg, group = group, label = n), color = "white", inherit.aes = FALSE)
+  scale_fill_gradient(low = "orange", high = "purple", guide = guide_legend()) + geom_text(data = centroid, mapping = aes(x_avg,y_avg, group = group, label = n), color = "black", inherit.aes = FALSE)
 
 write_csv(data, "data/DunkinAvgLocations#1.csv")
 write_csv(final_data, "data/DunkinAvgLocations#2.csv")
