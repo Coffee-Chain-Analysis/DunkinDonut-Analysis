@@ -56,3 +56,6 @@ data%>%
   theme_map()+
   theme(panel.background = element_blank()) + ggtitle("Baskin Robbin's Location", subtitle = "Total # of Stores") + labs(fill = "Average") + theme(legend.position="bottom", plot.title = element_text(hjust = 0.5),plot.subtitle =  element_text(hjust = 0.5))+
   scale_fill_gradient(low = "orange", high = "purple", guide = guide_legend()) + geom_text(data = centroid, mapping = aes(x_avg,y_avg, group = group, label = n), color = "black", inherit.aes = FALSE)
+
+
+write_csv(final_data, "data/BaskinsRobbinsAvgLocations#2.csv")
